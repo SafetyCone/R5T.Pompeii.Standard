@@ -1,4 +1,10 @@
 R5T.Pompeii.Standard - The standard implementations of the Pompeii solution and file functionality (like ISolutionFilePathProvider).
 
+The general method of operation for the Standard Pompeii implementation is:
+
+* Get solution directory from the currently executing executable's file path. (StandardSolutionDirectoryPathProvider, R5T.Macommania.IExecutableFileDirectoryPathProvider)
+* Get entry-point project directory paths from the solution directory path.
+
+
 Goals
 
