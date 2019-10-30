@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\R5T.Angleterria.Base\source\R5T.Angleterria.Base\R5T.Angleterria.Base.csproj" />
     <ProjectReference Include="..\..\..\R5T.Angleterria\source\R5T.Angleterria\R5T.Angleterria.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Dacia\source\R5T.Dacia\R5T.Dacia.csproj" />
     <ProjectReference Include="..\..\..\R5T.Lombardy.Base\source\R5T.Lombardy.Base\R5T.Lombardy.Base.csproj" />
     <ProjectReference Include="..\..\..\R5T.Macommania.Base\source\R5T.Macommania.Base\R5T.Macommania.Base.csproj" />
     <ProjectReference Include="..\..\..\R5T.Magyar\source\R5T.Magyar\R5T.Magyar.csproj" />
