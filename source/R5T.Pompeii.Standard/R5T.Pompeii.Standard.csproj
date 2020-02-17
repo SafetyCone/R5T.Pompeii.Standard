@@ -5,6 +5,8 @@
     <NoWarn>1701;1702;1591;1573</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\R5T.Lombardy.Standard\source\R5T.Lombardy.Standard\R5T.Lombardy.Standard.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Macommania.Standard\source\R5T.Macommania.Standard\R5T.Macommania.Standard.csproj" />
     <ProjectReference Include="..\..\..\R5T.Pompeii.Default\source\R5T.Pompeii.Default\R5T.Pompeii.Default.csproj" />
   </ItemGroup>
 </Project>
