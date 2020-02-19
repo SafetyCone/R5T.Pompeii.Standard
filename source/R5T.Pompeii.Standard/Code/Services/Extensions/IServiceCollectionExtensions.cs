@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+using R5T.Angleterria.Standard;
 using R5T.Dacia;
 using R5T.Lombardy.Standard;
 using R5T.Macommania.Standard;
@@ -243,6 +244,125 @@ namespace R5T.Pompeii.Standard
                 .AddEntryPointProjectBuildOutputPublishDirectoryPathProvider(entryPointProjectName, buildConfigurationName)
                 .AddEntryPointProjectFilePathProvider(entryPointProjectName)
                 ;
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFileNameProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddSolutionFileNameProvider(this IServiceCollection services, string solutionFileName)
+        {
+            services.AddDirectSolutionFileNameProvider(solutionFileName);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFileNameProvider"/> service.
+        /// </summary>
+        public static ServiceAction<ISolutionFileNameProvider> AddSolutionFileNameProviderAction(this IServiceCollection services, string solutionFileName)
+        {
+            var serviceAction = new ServiceAction<ISolutionFileNameProvider>(() => services.AddSolutionFileNameProvider(solutionFileName));
+            return serviceAction;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFileNameProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddSolutionFileNameProvider(this IServiceCollection services)
+        {
+            services.AddSingleSolutionFileNameProvider(
+                services.AddStringlyTypedPathOperatorAction());
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFileNameProvider"/> service.
+        /// </summary>
+        public static ServiceAction<ISolutionFileNameProvider> AddSolutionFileNameProviderAction(this IServiceCollection services)
+        {
+            var serviceAction = new ServiceAction<ISolutionFileNameProvider>(() => services.AddSolutionFileNameProvider());
+            return serviceAction;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddSolutionFilePathProvider(this IServiceCollection services,
+            ServiceAction<ISolutionFileNameProvider> addSolutionFileNameProvider)
+        {
+            services.AddStandardSolutionFilePathProvider(
+                services.AddSolutionDirectoryPathProviderAction(),
+                addSolutionFileNameProvider,
+                services.AddStringlyTypedPathOperatorAction());
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static ServiceAction<ISolutionFilePathProvider> AddSolutionFilePathProviderAction(this IServiceCollection services,
+            ServiceAction<ISolutionFileNameProvider> addSolutionFileNameProvider)
+        {
+            var serviceAction = new ServiceAction<ISolutionFilePathProvider>(() => services.AddSolutionFilePathProvider(
+                addSolutionFileNameProvider));
+            return serviceAction;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddSolutionFilePathProvider(this IServiceCollection services, string solutionFileName)
+        {
+            services.AddSolutionFilePathProvider(
+                services.AddSolutionFileNameProviderAction(solutionFileName));
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static ServiceAction<ISolutionFilePathProvider> AddSolutionFilePathProviderAction(this IServiceCollection services, string solutionFileName)
+        {
+            var serviceAction = new ServiceAction<ISolutionFilePathProvider>(() => services.AddSolutionFilePathProvider(solutionFileName));
+            return serviceAction;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddSolutionFilePathProvider(this IServiceCollection services)
+        {
+            services.AddSolutionFilePathProvider(
+                services.AddSolutionFileNameProviderAction());
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static ServiceAction<ISolutionFilePathProvider> AddSolutionFilePathProviderAction(this IServiceCollection services)
+        {
+            var serviceAction = new ServiceAction<ISolutionFilePathProvider>(() => services.AddSolutionFilePathProvider());
+            return serviceAction;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="IProjectBuildOutputBinariesDirectoryPathProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddProjectBuildOutputBinariesDirectoryPathProvider(this IServiceCollection services, string solutionFileName, string entryPointProjectName)
+        {
+            services.AddStandardProjectBinariesOutputDirectoryPathProvider(
+                services.AddSolutionFilePathProviderAction(solutionFileName),
+                services.AddEntryPointProjectNameProviderAction(entryPointProjectName),
+                services.AddVisualStudioStringlyTypedPathPartsOperatorAction(),
+                services.AddSolutionAndProjectFileSystemConventionsAction(),
+                services.AddStringlyTypedPathOperatorAction());
 
             return services;
         }
