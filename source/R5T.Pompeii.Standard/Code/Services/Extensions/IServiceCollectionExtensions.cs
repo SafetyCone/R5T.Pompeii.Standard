@@ -366,5 +366,15 @@ namespace R5T.Pompeii.Standard
 
             return services;
         }
+
+        /// <summary>
+        /// Adds the <see cref="IProjectBuildOutputBinariesDirectoryPathProvider"/> service.
+        /// </summary>
+        public static ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider> AddProjectBuildOutputBinariesDirectoryPathProviderAction(this IServiceCollection services, string solutionFileName, string entryPointProjectName)
+        {
+            var serviceAction = new ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider>(() => services.AddProjectBuildOutputBinariesDirectoryPathProvider(
+                solutionFileName, entryPointProjectName));
+            return serviceAction;
+        }
     }
 }
