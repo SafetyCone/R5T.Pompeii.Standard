@@ -35,25 +35,6 @@ namespace R5T.Pompeii.Standard
         }
 
         /// <summary>
-        /// Adds the <see cref="IEntryPointProjectNameProvider"/> service.
-        /// </summary>
-        public static IServiceCollection AddEntryPointProjectNameProvider(this IServiceCollection services, string entryPointProjectName)
-        {
-            services.AddDirectEntryPointProjectNameProvider(entryPointProjectName);
-
-            return services;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="IEntryPointProjectNameProvider"/> service.
-        /// </summary>
-        public static ServiceAction<IEntryPointProjectNameProvider> AddEntryPointProjectNameProviderAction(this IServiceCollection services, string entryPointProjectName)
-        {
-            var serviceAction = new ServiceAction<IEntryPointProjectNameProvider>(() => services.AddEntryPointProjectNameProvider(entryPointProjectName));
-            return serviceAction;
-        }
-
-        /// <summary>
         /// Adds the <see cref="IEntryPointProjectFrameworkNameProvider"/> service.
         /// </summary>
         public static IServiceCollection AddEntryPointProjectFrameworkNameProvider(this IServiceCollection services)
@@ -95,11 +76,12 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectDirectoryPathProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddEntryPointProjectDirectoryPathProvider(this IServiceCollection services, string entryPointProjectName)
+        public static IServiceCollection AddEntryPointProjectDirectoryPathProvider(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider)
         {
             services.AddStandardEntryPointProjectDirectoryPathProvider(
                 services.AddSolutionDirectoryPathProviderAction(),
-                services.AddEntryPointProjectNameProviderAction(entryPointProjectName),
+                addEntryPointProjectNameProvider,
                 services.AddSolutionAndProjectFileSystemConventionsAction());
             return services;
         }
@@ -107,19 +89,21 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectDirectoryPathProvider"/> service.
         /// </summary>
-        public static ServiceAction<IEntryPointProjectDirectoryPathProvider> AddEntryPointProjectDirectoryPathProviderAction(this IServiceCollection services, string entryPointProjectName)
+        public static ServiceAction<IEntryPointProjectDirectoryPathProvider> AddEntryPointProjectDirectoryPathProviderAction(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider)
         {
-            var serviceAction = new ServiceAction<IEntryPointProjectDirectoryPathProvider>(() => services.AddEntryPointProjectDirectoryPathProvider(entryPointProjectName));
+            var serviceAction = new ServiceAction<IEntryPointProjectDirectoryPathProvider>(() => services.AddEntryPointProjectDirectoryPathProvider(addEntryPointProjectNameProvider));
             return serviceAction;
         }
 
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputBinariesDirectoryPathProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddEntryPointProjectBuildOutputBinariesDirectoryPathProvider(this IServiceCollection services, string entryPointProjectName)
+        public static IServiceCollection AddEntryPointProjectBuildOutputBinariesDirectoryPathProvider(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider)
         {
             services.AddStandardEntryPointProjectBuildOutputBinariesDirectoryPathProvider(
-                services.AddEntryPointProjectDirectoryPathProviderAction(entryPointProjectName),
+                services.AddEntryPointProjectDirectoryPathProviderAction(addEntryPointProjectNameProvider),
                 services.AddSolutionAndProjectFileSystemConventionsAction());
             return services;
         }
@@ -127,39 +111,24 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputBinariesDirectoryPathProvider"/> service.
         /// </summary>
-        public static ServiceAction<IEntryPointProjectBuildOutputBinariesDirectoryPathProvider> AddEntryPointProjectBuildOutputBinariesDirectoryPathProviderAction(this IServiceCollection services, string entryPointProjectName)
+        public static ServiceAction<IEntryPointProjectBuildOutputBinariesDirectoryPathProvider> AddEntryPointProjectBuildOutputBinariesDirectoryPathProviderAction(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider)
         {
-            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputBinariesDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputBinariesDirectoryPathProvider(entryPointProjectName));
-            return serviceAction;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="IEntryPointProjectBuildConfigurationNameProvider"/> service.
-        /// </summary>
-        public static IServiceCollection AddEntryPointProjectBuildConfigurationNameProvider(this IServiceCollection services, string buildConfigurationName)
-        {
-            services.AddDirectEntryPointProjectBuildConfigurationNameProvider(buildConfigurationName);
-
-            return services;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="IEntryPointProjectBuildConfigurationNameProvider"/> service.
-        /// </summary>
-        public static ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> AddEntryPointProjectBuildConfigurationNameProviderAction(this IServiceCollection services, string buildConfigurationName)
-        {
-            var serviceAction = new ServiceAction<IEntryPointProjectBuildConfigurationNameProvider>(() => services.AddEntryPointProjectBuildConfigurationNameProvider(buildConfigurationName));
+            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputBinariesDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputBinariesDirectoryPathProvider(
+                addEntryPointProjectNameProvider));
             return serviceAction;
         }
 
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputConfigurationDirectoryPathProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddEntryPointProjectBuildOutputConfigurationDirectoryPathProvider(this IServiceCollection services, string entryPointProjectName, string buildConfigurationName)
+        public static IServiceCollection AddEntryPointProjectBuildOutputConfigurationDirectoryPathProvider(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
         {
             services.AddStandardEntryPointProjectBuildOutputConfigurationDirectoryPathProvider(
-                services.AddEntryPointProjectBuildOutputBinariesDirectoryPathProviderAction(entryPointProjectName),
-                services.AddEntryPointProjectBuildConfigurationNameProviderAction(buildConfigurationName),
+                services.AddEntryPointProjectBuildOutputBinariesDirectoryPathProviderAction(addEntryPointProjectNameProvider),
+                addEntryPointProjectBuildConfigurationNameProvider,
                 services.AddSolutionAndProjectFileSystemConventionsAction());
             return services;
         }
@@ -167,19 +136,27 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputConfigurationDirectoryPathProvider"/> service.
         /// </summary>
-        public static ServiceAction<IEntryPointProjectBuildOutputConfigurationDirectoryPathProvider> AddEntryPointProjectBuildOutputConfigurationDirectoryPathProviderAction(this IServiceCollection services, string entryPointProjectName, string buildConfigurationName)
+        public static ServiceAction<IEntryPointProjectBuildOutputConfigurationDirectoryPathProvider> AddEntryPointProjectBuildOutputConfigurationDirectoryPathProviderAction(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
         {
-            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputConfigurationDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputConfigurationDirectoryPathProvider(entryPointProjectName, buildConfigurationName));
+            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputConfigurationDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputConfigurationDirectoryPathProvider(
+                addEntryPointProjectNameProvider,
+                addEntryPointProjectBuildConfigurationNameProvider));
             return serviceAction;
         }
 
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputFrameworkDirectoryPathProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddEntryPointProjectBuildOutputFrameworkDirectoryPathProvider(this IServiceCollection services, string entryPointProjectName, string buildConfigurationName)
+        public static IServiceCollection AddEntryPointProjectBuildOutputFrameworkDirectoryPathProvider(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
         {
             services.AddStandardEntryPointProjectBuildOutputFrameworkDirectoryPathProvider(
-                services.AddEntryPointProjectBuildOutputConfigurationDirectoryPathProviderAction(entryPointProjectName, buildConfigurationName),
+                services.AddEntryPointProjectBuildOutputConfigurationDirectoryPathProviderAction(
+                    addEntryPointProjectNameProvider,
+                    addEntryPointProjectBuildConfigurationNameProvider),
                 services.AddEntryPointProjectFrameworkNameProviderAction(),
                 services.AddSolutionAndProjectFileSystemConventionsAction());
             return services;
@@ -188,19 +165,27 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputFrameworkDirectoryPathProvider"/> service.
         /// </summary>
-        public static ServiceAction<IEntryPointProjectBuildOutputFrameworkDirectoryPathProvider> AddEntryPointProjectBuildOutputFrameworkDirectoryPathProviderAction(this IServiceCollection services, string entryPointProjectName, string buildConfigurationName)
+        public static ServiceAction<IEntryPointProjectBuildOutputFrameworkDirectoryPathProvider> AddEntryPointProjectBuildOutputFrameworkDirectoryPathProviderAction(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
         {
-            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputFrameworkDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputFrameworkDirectoryPathProvider(entryPointProjectName, buildConfigurationName));
+            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputFrameworkDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputFrameworkDirectoryPathProvider(
+                    addEntryPointProjectNameProvider,
+                    addEntryPointProjectBuildConfigurationNameProvider));
             return serviceAction;
         }
 
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputPublishDirectoryPathProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddEntryPointProjectBuildOutputPublishDirectoryPathProvider(this IServiceCollection services, string entryPointProjectName, string buildConfigurationName)
+        public static IServiceCollection AddEntryPointProjectBuildOutputPublishDirectoryPathProvider(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
         {
             services.AddStandardEntryPointProjectBuildOutputPublishDirectoryPathProvider(
-                services.AddEntryPointProjectBuildOutputFrameworkDirectoryPathProviderAction(entryPointProjectName, buildConfigurationName),
+                services.AddEntryPointProjectBuildOutputFrameworkDirectoryPathProviderAction(
+                    addEntryPointProjectNameProvider,
+                    addEntryPointProjectBuildConfigurationNameProvider),
                 services.AddSolutionAndProjectFileSystemConventionsAction());
             return services;
         }
@@ -208,19 +193,24 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectBuildOutputPublishDirectoryPathProvider"/> service.
         /// </summary>
-        public static ServiceAction<IEntryPointProjectBuildOutputPublishDirectoryPathProvider> AddEntryPointProjectBuildOutputPublishDirectoryPathProviderAction(this IServiceCollection services, string entryPointProjectName, string buildConfigurationName)
+        public static ServiceAction<IEntryPointProjectBuildOutputPublishDirectoryPathProvider> AddEntryPointProjectBuildOutputPublishDirectoryPathProviderAction(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
         {
-            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputPublishDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputPublishDirectoryPathProvider(entryPointProjectName, buildConfigurationName));
+            var serviceAction = new ServiceAction<IEntryPointProjectBuildOutputPublishDirectoryPathProvider>(() => services.AddEntryPointProjectBuildOutputPublishDirectoryPathProvider(
+                    addEntryPointProjectNameProvider,
+                    addEntryPointProjectBuildConfigurationNameProvider));
             return serviceAction;
         }
 
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectFilePathProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddEntryPointProjectFilePathProvider(this IServiceCollection services, string entryPointProjectName)
+        public static IServiceCollection AddEntryPointProjectFilePathProvider(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider)
         {
             services.AddSingleProjectInDirectoryEntryPointProjectFilePathProvider(
-                services.AddEntryPointProjectDirectoryPathProviderAction(entryPointProjectName),
+                services.AddEntryPointProjectDirectoryPathProviderAction(addEntryPointProjectNameProvider),
                 services.AddStringlyTypedPathOperatorAction());
             return services;
         }
@@ -228,9 +218,10 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IEntryPointProjectFilePathProvider"/> service.
         /// </summary>
-        public static ServiceAction<IEntryPointProjectFilePathProvider> AddEntryPointProjectFilePathProviderAction(this IServiceCollection services, string entryPointProjectName)
+        public static ServiceAction<IEntryPointProjectFilePathProvider> AddEntryPointProjectFilePathProviderAction(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider)
         {
-            var serviceAction = new ServiceAction<IEntryPointProjectFilePathProvider>(() => services.AddEntryPointProjectFilePathProvider(entryPointProjectName));
+            var serviceAction = new ServiceAction<IEntryPointProjectFilePathProvider>(() => services.AddEntryPointProjectFilePathProvider(addEntryPointProjectNameProvider));
             return serviceAction;
         }
 
@@ -238,11 +229,15 @@ namespace R5T.Pompeii.Standard
         /// Adds all standard entry point project services.
         /// Including <see cref="IEntryPointProjectBuildOutputPublishDirectoryPathProvider"/> and <see cref="IEntryPointProjectFilePathProvider"/>.
         /// </summary>
-        public static IServiceCollection AddStandardEntryPointProjectConventions(this IServiceCollection services, string entryPointProjectName, string buildConfigurationName)
+        public static IServiceCollection AddStandardEntryPointProjectConventions(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
         {
             services
-                .AddEntryPointProjectBuildOutputPublishDirectoryPathProvider(entryPointProjectName, buildConfigurationName)
-                .AddEntryPointProjectFilePathProvider(entryPointProjectName)
+                .AddEntryPointProjectBuildOutputPublishDirectoryPathProvider(
+                    addEntryPointProjectNameProvider,
+                    addEntryPointProjectBuildConfigurationNameProvider)
+                .AddEntryPointProjectFilePathProvider(addEntryPointProjectNameProvider)
                 ;
 
             return services;
@@ -251,26 +246,7 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="ISolutionFileNameProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddSolutionFileNameProvider(this IServiceCollection services, string solutionFileName)
-        {
-            services.AddDirectSolutionFileNameProvider(solutionFileName);
-
-            return services;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="ISolutionFileNameProvider"/> service.
-        /// </summary>
-        public static ServiceAction<ISolutionFileNameProvider> AddSolutionFileNameProviderAction(this IServiceCollection services, string solutionFileName)
-        {
-            var serviceAction = new ServiceAction<ISolutionFileNameProvider>(() => services.AddSolutionFileNameProvider(solutionFileName));
-            return serviceAction;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="ISolutionFileNameProvider"/> service.
-        /// </summary>
-        public static IServiceCollection AddSolutionFileNameProvider(this IServiceCollection services)
+        public static IServiceCollection AddSingleSolutionFileNameProvider(this IServiceCollection services)
         {
             services.AddSingleSolutionFileNameProvider(
                 services.AddStringlyTypedPathOperatorAction());
@@ -281,9 +257,34 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="ISolutionFileNameProvider"/> service.
         /// </summary>
-        public static ServiceAction<ISolutionFileNameProvider> AddSolutionFileNameProviderAction(this IServiceCollection services)
+        public static ServiceAction<ISolutionFileNameProvider> AddSingleSolutionFileNameProviderAction(this IServiceCollection services)
         {
-            var serviceAction = new ServiceAction<ISolutionFileNameProvider>(() => services.AddSolutionFileNameProvider());
+            var serviceAction = new ServiceAction<ISolutionFileNameProvider>(() => services.AddSingleSolutionFileNameProvider());
+            return serviceAction;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddStandardSolutionFilePathProvider(this IServiceCollection services,
+            ServiceAction<ISolutionFileNameProvider> addSolutionFileNameProvider)
+        {
+            services.AddStandardSolutionFilePathProvider(
+                services.AddSolutionDirectoryPathProviderAction(),
+                addSolutionFileNameProvider,
+                services.AddStringlyTypedPathOperatorAction());
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        /// </summary>
+        public static ServiceAction<ISolutionFilePathProvider> AddStandardSolutionFilePathProviderAction(this IServiceCollection services,
+            ServiceAction<ISolutionFileNameProvider> addSolutionFileNameProvider)
+        {
+            var serviceAction = new ServiceAction<ISolutionFilePathProvider>(() => services.AddStandardSolutionFilePathProvider(
+                addSolutionFileNameProvider));
             return serviceAction;
         }
 
@@ -293,10 +294,7 @@ namespace R5T.Pompeii.Standard
         public static IServiceCollection AddSolutionFilePathProvider(this IServiceCollection services,
             ServiceAction<ISolutionFileNameProvider> addSolutionFileNameProvider)
         {
-            services.AddStandardSolutionFilePathProvider(
-                services.AddSolutionDirectoryPathProviderAction(),
-                addSolutionFileNameProvider,
-                services.AddStringlyTypedPathOperatorAction());
+            services.AddStandardSolutionFilePathProvider(addSolutionFileNameProvider);
 
             return services;
         }
@@ -312,54 +310,37 @@ namespace R5T.Pompeii.Standard
             return serviceAction;
         }
 
-        /// <summary>
-        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
-        /// </summary>
-        public static IServiceCollection AddSolutionFilePathProvider(this IServiceCollection services, string solutionFileName)
-        {
-            services.AddSolutionFilePathProvider(
-                services.AddSolutionFileNameProviderAction(solutionFileName));
+        ///// <summary>
+        ///// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        ///// </summary>
+        //public static IServiceCollection AddSolutionFilePathProvider(this IServiceCollection services)
+        //{
+        //    services.AddSolutionFilePathProvider(
+        //        services.AddSingleSolutionFileNameProviderAction());
 
-            return services;
-        }
+        //    return services;
+        //}
 
-        /// <summary>
-        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
-        /// </summary>
-        public static ServiceAction<ISolutionFilePathProvider> AddSolutionFilePathProviderAction(this IServiceCollection services, string solutionFileName)
-        {
-            var serviceAction = new ServiceAction<ISolutionFilePathProvider>(() => services.AddSolutionFilePathProvider(solutionFileName));
-            return serviceAction;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
-        /// </summary>
-        public static IServiceCollection AddSolutionFilePathProvider(this IServiceCollection services)
-        {
-            services.AddSolutionFilePathProvider(
-                services.AddSolutionFileNameProviderAction());
-
-            return services;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="ISolutionFilePathProvider"/> service.
-        /// </summary>
-        public static ServiceAction<ISolutionFilePathProvider> AddSolutionFilePathProviderAction(this IServiceCollection services)
-        {
-            var serviceAction = new ServiceAction<ISolutionFilePathProvider>(() => services.AddSolutionFilePathProvider());
-            return serviceAction;
-        }
+        ///// <summary>
+        ///// Adds the <see cref="ISolutionFilePathProvider"/> service.
+        ///// </summary>
+        //public static ServiceAction<ISolutionFilePathProvider> AddSolutionFilePathProviderAction(this IServiceCollection services)
+        //{
+        //    var serviceAction = new ServiceAction<ISolutionFilePathProvider>(() => services.AddSolutionFilePathProvider());
+        //    return serviceAction;
+        //}
 
         /// <summary>
         /// Adds the <see cref="IProjectBuildOutputBinariesDirectoryPathProvider"/> service.
         /// </summary>
-        public static IServiceCollection AddProjectBuildOutputBinariesDirectoryPathProvider(this IServiceCollection services, string solutionFileName, string entryPointProjectName)
+        public static IServiceCollection AddStandardProjectBinariesOutputDirectoryPathProvider(this IServiceCollection services,
+            ServiceAction<ISolutionFileNameProvider> addSolutionFileNameProvider,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider
+            )
         {
             services.AddStandardProjectBinariesOutputDirectoryPathProvider(
-                services.AddSolutionFilePathProviderAction(solutionFileName),
-                services.AddEntryPointProjectNameProviderAction(entryPointProjectName),
+                services.AddSolutionFilePathProviderAction(addSolutionFileNameProvider),
+                addEntryPointProjectNameProvider,
                 services.AddVisualStudioStringlyTypedPathPartsOperatorAction(),
                 services.AddSolutionAndProjectFileSystemConventionsAction(),
                 services.AddStringlyTypedPathOperatorAction());
@@ -370,10 +351,41 @@ namespace R5T.Pompeii.Standard
         /// <summary>
         /// Adds the <see cref="IProjectBuildOutputBinariesDirectoryPathProvider"/> service.
         /// </summary>
-        public static ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider> AddProjectBuildOutputBinariesDirectoryPathProviderAction(this IServiceCollection services, string solutionFileName, string entryPointProjectName)
+        public static ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider> AddStandardProjectBinariesOutputDirectoryPathProviderAction(this IServiceCollection services,
+            ServiceAction<ISolutionFileNameProvider> addSolutionFileNameProvider,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider)
         {
-            var serviceAction = new ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider>(() => services.AddProjectBuildOutputBinariesDirectoryPathProvider(
-                solutionFileName, entryPointProjectName));
+            var serviceAction = new ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider>(() => services.AddStandardProjectBinariesOutputDirectoryPathProvider(
+                addSolutionFileNameProvider,
+                addEntryPointProjectNameProvider));
+            return serviceAction;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="IProjectBuildOutputBinariesDirectoryPathProvider"/> service.
+        /// </summary>
+        public static IServiceCollection AddPublishProjectBuildOutputBinariesDirectoryPathProvider(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
+        {
+            services.AddPublishDirectoryProjectBuildOutputBinariesDirectoryPathProvider(
+                services.AddEntryPointProjectBuildOutputPublishDirectoryPathProviderAction(
+                    addEntryPointProjectNameProvider,
+                    addEntryPointProjectBuildConfigurationNameProvider));
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="IProjectBuildOutputBinariesDirectoryPathProvider"/> service.
+        /// </summary>
+        public static ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider> AddPublishProjectBuildOutputBinariesDirectoryPathProviderAction(this IServiceCollection services,
+            ServiceAction<IEntryPointProjectNameProvider> addEntryPointProjectNameProvider,
+            ServiceAction<IEntryPointProjectBuildConfigurationNameProvider> addEntryPointProjectBuildConfigurationNameProvider)
+        {
+            var serviceAction = new ServiceAction<IProjectBuildOutputBinariesDirectoryPathProvider>(() => services.AddPublishProjectBuildOutputBinariesDirectoryPathProvider(
+                addEntryPointProjectNameProvider,
+                addEntryPointProjectBuildConfigurationNameProvider));
             return serviceAction;
         }
     }
